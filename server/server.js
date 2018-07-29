@@ -14,14 +14,18 @@ app.use(express.static(publicPath))
 io.on('connection',(socket)=>{
     console.log('New user connected...')
 
+    socket.emit('newMessage',{
+            from:'admin',
+            text:'welcome to the chat'}
+        )
+    socket.broadcast.emit('newMessage',{
+            text:`new user just joined!`
+        })
+
 
     socket.on('createMessage',(newMsgData)=>{
         console.log('new message created',newMsgData)
-        io.emit('newMessage',{
-            from:newMsgData.from,
-            text:newMsgData.text,
-            createdAt:new Date().getTime()
-        })
+
     })
 
     socket.on('disconnect',()=>{
