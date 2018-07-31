@@ -10,18 +10,23 @@ const socket=io()
 
 socket.on('newMessage',(msg)=>{
     const formatedTime=moment(msg.createdAt).format('h:mm a')
-    const li=jQuery('<li></li>')
-    li.text(`${msg.from} ${formatedTime}: ${msg.text}`)
-    jQuery('#messages').append(li)
+    const template=jQuery('#message-template').html()
+    const html=Mustache.render(template,{
+        text:msg.text,
+        from:msg.from,
+        createdAt:formatedTime
+    })
+    jQuery('#messages').append(html)
 })
 socket.on('newLocationMessage',(msg)=>{
     const formatedTime=moment(msg.createdAt).format('h:mm a')
-    const li=jQuery('<li></li>')
-    const a=jQuery('<a target="_blank">Open my location on Google Maps</a>')
-    li.text(`${msg.from} ${formatedTime}: `)
-    a.attr('href',msg.url)
-    li.append(a)
-    jQuery('#messages').append(li)
+    const template=jQuery('#location-message-template').html()
+    const html=Mustache.render(template,{
+        url:msg.url,
+        from:msg.from,
+        createdAt:formatedTime
+    })
+    jQuery('#messages').append(html)
 })
 
 
