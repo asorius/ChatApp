@@ -1,23 +1,24 @@
 const socket=io()
-socket.on('connect',()=>{
-    console.log('Connected..')
+// socket.on('connect',()=>{
+//     console.log('Connected..')
 
-})
-socket.on('disconnect',()=>{
-    console.log('Disconnected..')
-})
+// })
+// socket.on('disconnect',()=>{
+//     console.log('Disconnected..')
+// })
 
 
 socket.on('newMessage',(msg)=>{
-    console.log('New message',msg)
+    const formatedTime=moment(msg.createdAt).format('h:mm a')
     const li=jQuery('<li></li>')
-    li.text(`${msg.from}: ${msg.text}`)
+    li.text(`${msg.from} ${formatedTime}: ${msg.text}`)
     jQuery('#messages').append(li)
 })
 socket.on('newLocationMessage',(msg)=>{
+    const formatedTime=moment(msg.createdAt).format('h:mm a')
     const li=jQuery('<li></li>')
     const a=jQuery('<a target="_blank">Open my location on Google Maps</a>')
-    li.text=`admin: `
+    li.text(`${msg.from} ${formatedTime}: `)
     a.attr('href',msg.url)
     li.append(a)
     jQuery('#messages').append(li)
