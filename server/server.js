@@ -13,7 +13,7 @@ const server=http.createServer(app)
 const io=socket(server)
 app.use(express.static(publicPath))
 io.on('connection',(socket)=>{
-
+    console.log('User connected')
     socket.emit('newMessage',generateMessage('admin','welcome to the chat!')
         )
     socket.broadcast.emit('newMessage',generateMessage('admin','user has joined!'))
@@ -21,7 +21,7 @@ io.on('connection',(socket)=>{
 
     socket.on('createMessage',(newMsgData,callback)=>{
         io.emit('newMessage',generateMessage(newMsgData.from,newMsgData.text))
-        callback('this is form the server')
+        callback()
     })
     socket.on('createLocationMessage',(coords)=>{
         io.emit('newLocationMessage',generateLocationMessage('admin',coords.lat, coords.long))
