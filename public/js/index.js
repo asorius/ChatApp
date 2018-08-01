@@ -5,7 +5,41 @@ const socket=io()
 // })
 // socket.on('disconnect',()=>{
 //     console.log('Disconnected..')
-// })
+
+
+function scrollToBottom () {
+    // Selectors
+    var messages = jQuery('#messages');
+    var newMessage = messages.children('li:last-child')
+    // Heights
+    var clientHeight = messages.prop('clientHeight');
+    var scrollTop = messages.prop('scrollTop');
+    var scrollHeight = messages.prop('scrollHeight');
+    var newMessageHeight = newMessage.innerHeight();
+    var lastMessageHeight = newMessage.prev().innerHeight();
+  
+    if (clientHeight + scrollTop + newMessageHeight + lastMessageHeight >= scrollHeight) {
+        console.log(clientHeight ,'+', scrollTop, '+' ,newMessageHeight, '+' ,lastMessageHeight, '>=' ,scrollHeight)
+        messages.animate({scrollTop:scrollHeight}, 250)
+    }
+  }
+// function scrollToBottom(){
+//     let messages=$('#messages'),
+//         newMessage=messages.children('li:last-child'),
+//         clientHeight=messages.prop('clientHeight'),
+//         scrollTop=messages.prop('scrollTop'),
+//         scrollHeight=messages.prop('scrollHeight'),
+//         newMessageHeight=newMessage.innerHeight(),
+//         lastMessageHeight=newMessage.prev().innerHeight()
+
+//     if(scrollHeight>clientHeight){
+//         console.log('should scroll')
+//         console.log(clientHeight ,'+', scrollTop, '+' ,newMessageHeight, '+' ,lastMessageHeight, '>=' ,scrollHeight)
+//         // messages.animate({scrollTop:scrollHeight-clientHeight}, 250)
+//         messages.scrollTop(scrollHeight)
+//     }
+
+// }
 
 
 socket.on('newMessage',(msg)=>{
@@ -17,6 +51,7 @@ socket.on('newMessage',(msg)=>{
         createdAt:formatedTime
     })
     jQuery('#messages').append(html)
+    scrollToBottom()
 })
 socket.on('newLocationMessage',(msg)=>{
     const formatedTime=moment(msg.createdAt).format('h:mm a')
@@ -27,6 +62,7 @@ socket.on('newLocationMessage',(msg)=>{
         createdAt:formatedTime
     })
     jQuery('#messages').append(html)
+    scrollToBottom()
 })
 
 
@@ -57,3 +93,4 @@ locationBtn.on('click',(e)=>{
         locationBtn.removeAttr('disabled')        
         alert('Unable to fetch location.')})
 })
+
