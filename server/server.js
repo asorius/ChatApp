@@ -4,6 +4,8 @@ const express=require('express')
 const socket=require('socket.io')
 const http=require('http')
 const {generateMessage,generateLocationMessage}=require('./utils/message')
+const {isRealString}=require('./utils/validation')
+
 
 // for heroku
 const port=process.env.PORT || 3000
@@ -28,6 +30,12 @@ io.on('connection',(socket)=>{
     })
     socket.on('disconnect',()=>{
         console.log('User disconnected..')
+    })
+    socket.on('join',(params,callback)=>{
+        if(!isRealString(params.name) || !isRealString(params.room)){
+            callback('name and room name are required')
+        }
+        callback()
     })
     
 })

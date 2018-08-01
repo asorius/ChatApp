@@ -1,10 +1,17 @@
 const socket=io()
-// socket.on('connect',()=>{
-//     console.log('Connected..')
-
-// })
-// socket.on('disconnect',()=>{
-//     console.log('Disconnected..')
+socket.on('connect',()=>{
+    const params=jQuery.deparam(window.location.search)
+    socket.emit('join',params,(err)=>{
+        if(err){
+            alert(err)
+            window.location.href='/'
+        }else{
+            console.log('no errors')
+        }
+    })
+})
+socket.on('disconnect',()=>{
+    console.log('Disconnected..')})
 
 
 function scrollToBottom () {
@@ -23,24 +30,6 @@ function scrollToBottom () {
         messages.animate({scrollTop:scrollHeight}, 250)
     }
   }
-// function scrollToBottom(){
-//     let messages=$('#messages'),
-//         newMessage=messages.children('li:last-child'),
-//         clientHeight=messages.prop('clientHeight'),
-//         scrollTop=messages.prop('scrollTop'),
-//         scrollHeight=messages.prop('scrollHeight'),
-//         newMessageHeight=newMessage.innerHeight(),
-//         lastMessageHeight=newMessage.prev().innerHeight()
-
-//     if(scrollHeight>clientHeight){
-//         console.log('should scroll')
-//         console.log(clientHeight ,'+', scrollTop, '+' ,newMessageHeight, '+' ,lastMessageHeight, '>=' ,scrollHeight)
-//         // messages.animate({scrollTop:scrollHeight-clientHeight}, 250)
-//         messages.scrollTop(scrollHeight)
-//     }
-
-// }
-
 
 socket.on('newMessage',(msg)=>{
     const formatedTime=moment(msg.createdAt).format('h:mm a')
