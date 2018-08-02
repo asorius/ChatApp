@@ -20,11 +20,17 @@ io.on('connection',(socket)=>{
     console.log('User connected')
 
     socket.on('createMessage',(newMsgData,callback)=>{
-        io.emit('newMessage',generateMessage(newMsgData.from,newMsgData.text))
+        const user=users.getUser(socket.id)
+        if(user && isRealString(newMsgData.text)){
+            io.to(user.room).emit('newMessage',generateMessage(user.name,newMsgData.text))
+        }
         callback()
+        
     })
     socket.on('createLocationMessage',(coords)=>{
-        io.emit('newLocationMessage',generateLocationMessage('Server',coords.lat, coords.long))
+        const user=users.getUser(socket.id)
+        if(user){
+        io.to(user.room).emit('newLocationMessage',generateLocationMessage(user.name,coords.lat, coords.long))}
     })
 
     socket.on('join',(params,callback)=>{
