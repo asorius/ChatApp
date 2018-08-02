@@ -5,7 +5,9 @@ const socket=require('socket.io')
 const http=require('http')
 const {generateMessage,generateLocationMessage}=require('./utils/message')
 const {isRealString}=require('./utils/validation')
+const {Users}=require('./utils/users')
 
+const users=new Users()
 
 // for heroku
 const port=process.env.PORT || 3000
@@ -16,26 +18,39 @@ const io=socket(server)
 app.use(express.static(publicPath))
 io.on('connection',(socket)=>{
     console.log('User connected')
-    socket.emit('newMessage',generateMessage('admin','welcome to the chat!')
-        )
-    socket.broadcast.emit('newMessage',generateMessage('admin','user has joined!'))
-
 
     socket.on('createMessage',(newMsgData,callback)=>{
         io.emit('newMessage',generateMessage(newMsgData.from,newMsgData.text))
         callback()
     })
     socket.on('createLocationMessage',(coords)=>{
-        io.emit('newLocationMessage',generateLocationMessage('admin',coords.lat, coords.long))
+        io.emit('newLocationMessage',generateLocationMessage('Server',coords.lat, coords.long))
     })
-    socket.on('disconnect',()=>{
-        console.log('User disconnected..')
-    })
+
     socket.on('join',(params,callback)=>{
         if(!isRealString(params.name) || !isRealString(params.room)){
-            callback('name and room name are required')
+            return callback('name and room name are required')
         }
+        socket.join(params.room)
+
+        users.removeUser(socket.id)
+        users.addUser(socket.id,params.name,params.room)
+        io.to(params.room).emit('updateUserList', users.getUsersList(params.room))
+
+        socket.emit('newMessage',generateMessage('Server','welcome to the chat!'))
+        socket.broadcast.to(params.room).emit('newMessage',generateMessage(`${params.name} has joined!`))
+
         callback()
+    })
+
+    socket.on('disconnect',()=>{
+        const user=users.removeUser(socket.id)
+
+        if(user){
+            io.to(user.room).emit('updateUserList',users.getUsersList(user.room))
+            io.to(user.room).emit('newMessage',generateMessage('server',`${user.name} has left the room..`))
+
+        }
     })
     
 })

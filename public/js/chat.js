@@ -1,4 +1,19 @@
 const socket=io()
+function scrollToBottom () {
+    // Selectors
+    var messages = jQuery('#messages');
+    var newMessage = messages.children('li:last-child')
+    // Heights
+    var clientHeight = messages.prop('clientHeight');
+    var scrollTop = messages.prop('scrollTop');
+    var scrollHeight = messages.prop('scrollHeight');
+    var newMessageHeight = newMessage.innerHeight();
+    var lastMessageHeight = newMessage.prev().innerHeight();
+  
+    if (clientHeight + scrollTop + newMessageHeight + lastMessageHeight >= scrollHeight) {
+        messages.animate({scrollTop:scrollHeight}, 250)
+    }
+  }
 socket.on('connect',()=>{
     const params=jQuery.deparam(window.location.search)
     socket.emit('join',params,(err)=>{
@@ -13,23 +28,13 @@ socket.on('connect',()=>{
 socket.on('disconnect',()=>{
     console.log('Disconnected..')})
 
-
-function scrollToBottom () {
-    // Selectors
-    var messages = jQuery('#messages');
-    var newMessage = messages.children('li:last-child')
-    // Heights
-    var clientHeight = messages.prop('clientHeight');
-    var scrollTop = messages.prop('scrollTop');
-    var scrollHeight = messages.prop('scrollHeight');
-    var newMessageHeight = newMessage.innerHeight();
-    var lastMessageHeight = newMessage.prev().innerHeight();
-  
-    if (clientHeight + scrollTop + newMessageHeight + lastMessageHeight >= scrollHeight) {
-        console.log(clientHeight ,'+', scrollTop, '+' ,newMessageHeight, '+' ,lastMessageHeight, '>=' ,scrollHeight)
-        messages.animate({scrollTop:scrollHeight}, 250)
-    }
-  }
+socket.on('updateUserList',(usersArray)=>{
+    const ul=$('<ul></ul>')
+    usersArray.forEach(element=> {
+        ul.append($('<li></li>').text(element))
+    })
+    $('#users').html(ul)
+})
 
 socket.on('newMessage',(msg)=>{
     const formatedTime=moment(msg.createdAt).format('h:mm a')
