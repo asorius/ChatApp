@@ -1,7 +1,7 @@
 # ChatApp
 ### Stack:
   * Backend: NodeJS,
-  * Testing:MochaJS & ExpectJS,
+  * Testing: MochaJS & ExpectJS,
   * Real-time DOM updates: Socket.io,
   * UI: jQuery & MustacheJS
   
